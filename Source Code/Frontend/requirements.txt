@@ -1,0 +1,9 @@
+Flask>=2.2
+Werkzeug>=2.2
+torch
+torchvision
+timm
+Pillow
+numpy
+joblib
+scikit-learn
