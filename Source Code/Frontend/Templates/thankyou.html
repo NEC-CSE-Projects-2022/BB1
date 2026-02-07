@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thank You - MedAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=25">
+    <style>
+        .thankyou-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .back-to-home-thankyou {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-to-home-thankyou:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .thankyou-container {
+            text-align: center;
+            padding: 3rem;
+            max-width: 600px;
+            z-index: 10;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .thankyou-icon {
+            font-size: 6rem;
+            margin-bottom: 1.5rem;
+            animation: bounceIn 1s ease;
+            filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.3));
+        }
+
+        .thankyou-title {
+            font-size: 3rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            line-height: 1.2;
+        }
+
+        .thankyou-user {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .thankyou-message {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .thankyou-subtext {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2.5rem;
+        }
+
+        .thankyou-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: white;
+            color: #667eea;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .thankyou-cta:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+        }
+
+        /* Animated background elements */
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .bg-circle-1 {
+            width: 300px;
+            height: 300px;
+            background: white;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .bg-circle-2 {
+            width: 200px;
+            height: 200px;
+            background: white;
+            bottom: 15%;
+            right: 15%;
+            animation-delay: 3s;
+        }
+
+        .bg-circle-3 {
+            width: 150px;
+            height: 150px;
+            background: white;
+            top: 50%;
+            right: 10%;
+            animation-delay: 6s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+        }
+
+        /* Sparkle effect */
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: sparkle 2s infinite ease-in-out;
+            opacity: 0;
+        }
+
+        @keyframes sparkle {
+            0%, 100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .thankyou-title {
+                font-size: 2rem;
+            }
+            
+            .thankyou-user {
+                font-size: 1.75rem;
+            }
+            
+            .thankyou-message {
+                font-size: 1rem;
+            }
+            
+            .thankyou-icon {
+                font-size: 4rem;
+            }
+
+            .back-to-home-thankyou {
+                top: 1rem;
+                left: 1rem;
+                padding: 0.6rem 1.2rem;
+                font-size: 0.85rem;
+            }
+
+            .thankyou-container {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="dark-mode thankyou-page">
+    
+    <!-- Back to Home Button -->
+    <a href="{{ url_for('welcome') }}" class="back-to-home-thankyou">
+        <span>← Back to Home</span>
+    </a>
+
+    <!-- Background animated circles -->
+    <div class="bg-circle bg-circle-1"></div>
+    <div class="bg-circle bg-circle-2"></div>
+    <div class="bg-circle bg-circle-3"></div>
+
+    <!-- Sparkles -->
+    <div class="sparkle" style="top: 20%; left: 30%; animation-delay: 0s;"></div>
+    <div class="sparkle" style="top: 40%; left: 70%; animation-delay: 0.5s;"></div>
+    <div class="sparkle" style="top: 60%; left: 20%; animation-delay: 1s;"></div>
+    <div class="sparkle" style="top: 80%; left: 60%; animation-delay: 1.5s;"></div>
+    <div class="sparkle" style="top: 30%; left: 80%; animation-delay: 0.3s;"></div>
+    <div class="sparkle" style="top: 70%; left: 40%; animation-delay: 0.8s;"></div>
+
+    <!-- Main Content -->
+    <div class="thankyou-container">
+        <div class="thankyou-icon">🎉</div>
+        
+        <h1 class="thankyou-title">Thank You</h1>
+        <div class="thankyou-user">{{ name }}!</div>
+        
+        <p class="thankyou-message">
+            We appreciate you using Our Service for your skin health analysis. 
+            Your wellness journey matters to us.
+        </p>
+        
+        <p class="thankyou-subtext">
+            Stay healthy and take care! We're here whenever you need us.
+        </p>
+        
+        <a href="{{ url_for('welcome') }}" class="thankyou-cta">
+            <span>🏠</span>
+            <span>Return to Home</span>
+        </a>
+    </div>
+
+    <script>
+        // Add some random sparkles
+        function createSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.style.top = Math.random() * 100 + '%';
+            sparkle.style.left = Math.random() * 100 + '%';
+            sparkle.style.animationDelay = Math.random() * 2 + 's';
+            document.body.appendChild(sparkle);
+            
+            setTimeout(() => sparkle.remove(), 2000);
+        }
+
+        // Create sparkles periodically
+        setInterval(createSparkle, 500);
+    </script>
+</body>
+</html>

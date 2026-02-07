@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - MedAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=25">
+</head>
+<body class="dark-mode auth-page">
+    
+    <!-- Back to Home Button -->
+    <a href="{{ url_for('welcome') }}" class="back-to-home">
+        <span>← Back to Home</span>
+    </a>
+
+    <!-- Auth Section -->
+    <section class="auth-section">
+        <div class="auth-container">
+            <div class="auth-card auth-form-side fade-in">
+                <div class="auth-logo">
+                    <!-- <span class="logo-icon">🧬</span>
+                    <span class="logo-text">MedAI</span> -->
+                </div>
+                
+                <div class="auth-header">
+                    <h1>Create Account</h1>
+                    <p>Start analyzing with AI-powered precision</p>
+                </div>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form method="POST" class="auth-form" id="signupForm" novalidate>
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input 
+                            type="text" 
+                            id="name" 
+                            name="name" 
+                            autocomplete="name">
+                        <div class="input-icon">👤</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input 
+                            type="text" 
+                            id="email" 
+                            name="email" 
+                            autocomplete="email">
+                        <div class="input-icon">📧</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input 
+                            type="text" 
+                            id="password" 
+                            name="password" 
+                            autocomplete="new-password">
+                        <div class="input-icon">🔒</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm Password</label>
+                        <input 
+                            type="text" 
+                            id="confirm-password" 
+                            name="confirm_password" 
+                            autocomplete="new-password">
+                        <div class="input-icon">✅</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Create Account →
+                    </button>
+                </form>
+                
+                <div class="auth-footer">
+                    <p>Already have an account? <a href="{{ url_for('login') }}" class="auth-link">Sign in</a></p>
+                </div>
+            </div>
+
+            <!-- Right Side: Benefits -->
+            <div class="auth-card auth-info-side fade-in">
+                <div style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+                    <h2 style="font-size: 1.75rem; color: #ffffff; margin-bottom: 2rem; font-weight: 700;">Why Choose Us?</h2>
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <div style="display: flex; gap: 1rem; align-items: start;">
+                            <div style="font-size: 2rem;">⚡</div>
+                            <div>
+                                <div style="font-weight: 600; color: #ffffff; margin-bottom: 0.25rem; font-size: 1.05rem;">Lightning Fast</div>
+                                <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">Get results in under 3 seconds</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 1rem; align-items: start;">
+                            <div style="font-size: 2rem;">🎯</div>
+                            <div>
+                                <div style="font-weight: 600; color: #ffffff; margin-bottom: 0.25rem; font-size: 1.05rem;">Highly Accurate</div>
+                                <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">Advanced AI diagnostic system</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 1rem; align-items: start;">
+                            <div style="font-size: 2rem;">🔒</div>
+                            <div>
+                                <div style="font-weight: 600; color: #ffffff; margin-bottom: 0.25rem; font-size: 1.05rem;">Secure & Private</div>
+                                <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">HIPAA compliant encryption</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 1rem; align-items: start;">
+                            <div style="font-size: 2rem;">📊</div>
+                            <div>
+                                <div style="font-weight: 600; color: #ffffff; margin-bottom: 0.25rem; font-size: 1.05rem;">Track Progress</div>
+                                <div style="color: rgba(255, 255, 255, 0.7); font-size: 0.9rem;">Full analysis history</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Apply theme immediately
+        (function() {
+            const savedTheme = localStorage.getItem('medai-theme') || 'dark';
+            document.body.classList.add(savedTheme === 'light' ? 'light-mode' : 'dark-mode');
+            const icon = document.getElementById('theme-icon');
+            if (icon) icon.textContent = savedTheme === 'light' ? '🌙' : '🌞';
+        })();
+
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('theme-icon');
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                body.classList.add('light-mode');
+                localStorage.setItem('medai-theme', 'light');
+                icon.textContent = '🌙';
+            } else {
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+                localStorage.setItem('medai-theme', 'dark');
+                icon.textContent = '🌞';
+            }
+        }
+
+        // Password visibility toggle
+        function togglePasswordVisibility(inputId, button) {
+            const input = document.getElementById(inputId);
+            const eyeIcon = button.querySelector('.eye-icon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                eyeIcon.textContent = '🙈';
+                button.setAttribute('aria-label', 'Hide password');
+            } else {
+                input.type = 'password';
+                eyeIcon.textContent = '👁️';
+                button.setAttribute('aria-label', 'Show password');
+            }
+        }
+
+        // Form submission - no validation
+        const form = document.getElementById('signupForm');
+        
+        form.addEventListener('submit', function(e) {
+            // No validation - allow any input
+            console.log('Signup form submitted with:', {
+                name: document.getElementById('name').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                confirmPassword: document.getElementById('confirm-password').value
+            });
+        });
+    </script>
+</body>
+</html>

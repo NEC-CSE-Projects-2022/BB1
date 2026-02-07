@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - MedAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=25">
+</head>
+<body class="dark-mode auth-page">
+    
+    <!-- Back to Home Button -->
+    <a href="{{ url_for('welcome') }}" class="back-to-home">
+        <span>← Back to Home</span>
+    </a>
+
+    <!-- Auth Section -->
+    <section class="auth-section">
+        <div class="auth-container">
+            <!-- Left Side: Form -->
+            <div class="auth-card auth-form-side fade-in">
+                <div class="auth-logo">
+                    <!-- <span class="logo-icon">🧬</span>
+                    <span class="logo-text">MedAI</span> -->
+                </div>
+                
+                <div class="auth-header">
+                    <h1>Welcome Back</h1>
+                    <p>Sign in to access your AI analysis dashboard</p>
+                </div>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                <form method="POST" class="auth-form" id="loginForm" novalidate>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input 
+                            type="text" 
+                            id="email" 
+                            name="email" 
+                            autocomplete="email">
+                        <div class="input-icon">📧</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input 
+                            type="text" 
+                            id="password" 
+                            name="password" 
+                            autocomplete="current-password">
+                        <div class="input-icon">🔒</div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Sign In →
+                    </button>
+                </form>
+                
+                <div class="auth-footer">
+                    <p>Don't have an account? <a href="{{ url_for('signup') }}" class="auth-link">Create account</a></p>
+                </div>
+            </div>
+
+            <!-- Right Side: Info -->
+            <div class="auth-card auth-info-side fade-in">
+                <div style="height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                    <div style="font-size: 4rem; margin-bottom: 2rem; filter: drop-shadow(0 4px 20px rgba(180, 18, 27, 0.5));">🔬</div>
+                    <h2 style="font-size: 2rem; color: #ffffff; margin-bottom: 1rem; font-weight: 700;">AI-Powered Diagnostics</h2>
+                    <p style="color: rgba(255, 255, 255, 0.75); font-size: 1.05rem; line-height: 1.7; max-width: 350px;">
+                        Advanced machine learning models analyze skin lesions in under 3 seconds.
+                    </p>
+                    <div style="margin-top: 3rem; display: flex; justify-content: center; width: 100%;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 2rem; font-weight: 700; color: #ffffff; margin-bottom: 0.5rem;">&lt;3s</div>
+                            <div style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.65);">Analysis Time</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Apply theme immediately
+        (function() {
+            const savedTheme = localStorage.getItem('medai-theme') || 'dark';
+            document.body.classList.add(savedTheme === 'light' ? 'light-mode' : 'dark-mode');
+            const icon = document.getElementById('theme-icon');
+            if (icon) icon.textContent = savedTheme === 'light' ? '🌙' : '🌞';
+        })();
+
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('theme-icon');
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                body.classList.add('light-mode');
+                localStorage.setItem('medai-theme', 'light');
+                icon.textContent = '🌙';
+            } else {
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+                localStorage.setItem('medai-theme', 'dark');
+                icon.textContent = '🌞';
+            }
+        }
+
+        // Password visibility toggle
+        function togglePasswordVisibility(inputId, button) {
+            const input = document.getElementById(inputId);
+            const eyeIcon = button.querySelector('.eye-icon');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                eyeIcon.textContent = '🙈';
+                button.setAttribute('aria-label', 'Hide password');
+            } else {
+                input.type = 'password';
+                eyeIcon.textContent = '👁️';
+                button.setAttribute('aria-label', 'Show password');
+            }
+        }
+
+        // Form submission - no validation
+        const form = document.getElementById('loginForm');
+        
+        form.addEventListener('submit', function(e) {
+            // No validation - allow any input
+            console.log('Login form submitted with:', {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            });
+        });
+    </script>
+</body>
+</html>

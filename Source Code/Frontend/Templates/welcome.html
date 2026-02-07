@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <title>MedAI - AI-Powered Skin Cancer Detection</title> -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}?v=52"
+    />
+  </head>
+  <body class="dark-mode">
+    <!-- Top Navigation Bar -->
+    <nav class="dashboard-nav">
+        <div class="nav-left">
+            <div class="logo">
+                <!-- <span class="logo-icon">🧬</span>
+                <span class="logo-text">MedAI</span> -->
+            </div>
+        </div>
+        
+        <div class="nav-right">
+            <div class="user-info">
+                <span class="user-greeting">👋 Hello, <strong>{{ session.get('user_name', session.get('name', 'Guest')) }}</strong></span>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline btn-small">
+                🚪 Logout
+            </a>
+        </div>
+    </nav>
+
+    <!-- Welcome Hero Section -->
+    <section class="welcome-hero">
+      <div class="welcome-content">
+        <!-- Header with Logo -->
+        <div class="welcome-header fade-in">
+          <div class="logo">
+            <!-- <span class="logo-icon">🧬</span>
+                    <span class="logo-text">MedAI</span> -->
+          </div>
+        </div>
+
+        <!-- Main Hero Content -->
+        <div class="hero-main fade-in">
+          <h1 class="gradient-text-animated">Early Detection Saves Lives</h1>
+          <p class="hero-subtitle">
+            Advanced artificial intelligence technology for instant skin cancer
+            detection. Analyze dermatological images with professional-grade
+            accuracy in seconds.
+          </p>
+
+          <!-- CTA Buttons -->
+          <div class="cta-buttons">
+            <a
+              href="{{ url_for('login') }}"
+              class="btn btn-secondary btn-large glow-on-hover"
+            >
+              <span>🔐 Login</span>
+            </a>
+            <a
+              href="{{ url_for('signup') }}"
+              class="btn btn-secondary btn-large glow-on-hover"
+            >
+              <span>📝 Sign Up</span>
+            </a>
+            <a
+              href="{{ url_for('dashboard') }}"
+              class="btn btn-primary btn-large glow-on-hover"
+            >
+              <span>🧬 Start Analysis</span>
+            </a>
+          </div>
+
+          <!-- Dataset Button -->
+          <div class="dataset-button-container">
+            <a
+              href="https://www.kaggle.com/datasets/kmader/skin-cancer-mnist-ham10000"
+              target="_blank"
+              class="btn btn-dataset scale-on-hover"
+            >
+              <span>📊 View Dataset </span>
+            </a>
+          </div>
+
+          <!-- Stats -->
+          <div class="welcome-stats fade-in">
+            <div class="stat-item floating">
+              <div class="stat-number">&lt;3s</div>
+              <div class="stat-label">Analysis Time</div>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item floating" style="animation-delay: 0.3s">
+              <div class="stat-number">7</div>
+              <div class="stat-label">Conditions</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Features Grid -->
+        <div class="welcome-features fade-in">
+          <h2>Detectable Skin Conditions</h2>
+          <div class="features-grid-compact">
+            <a
+              class="feature-item glass-effect feature-link"
+              href="{{ url_for('condition_gallery', condition_slug='actinic-keratosis') }}"
+            >
+              <span class="feature-icon">🔬</span>
+              <span class="feature-name">Actinic Keratosis</span>
+            </a>
+            <a
+              class="feature-item glass-effect feature-link"
+              href="{{ url_for('condition_gallery', condition_slug='basal-cell-carcinoma') }}"
+            >
+              <span class="feature-icon">🎯</span>
+              <span class="feature-name">Basal Cell Carcinoma</span>
+            </a>
+            <a
+              class="feature-item glass-effect feature-link"
+              href="{{ url_for('condition_gallery', condition_slug='benign-keratosis') }}"
+            >
+              <span class="feature-icon">✨</span>
+              <span class="feature-name">Benign Keratosis</span>
+            </a>
+            <a
+              class="feature-item glass-effect feature-link"
+              href="{{ url_for('condition_gallery', condition_slug='dermatofibroma') }}"
+            >
+              <span class="feature-icon">🔍</span>
+              <span class="feature-name">Dermatofibroma</span>
+            </a>
+            <a
+              class="feature-item glass-effect feature-link"
+              href="{{ url_for('condition_gallery', condition_slug='melanoma') }}"
+            >
+              <span class="feature-icon">⚠️</span>
+              <span class="feature-name">Melanoma</span>
+            </a>
+            <a
+              class="feature-item glass-effect feature-link"
+              href="{{ url_for('condition_gallery', condition_slug='melanocytic-nevus') }}"
+            >
+              <span class="feature-icon">🔵</span>
+              <span class="feature-name">Melanocytic Nevus</span>
+            </a>
+            <a
+              class="feature-item glass-effect feature-link"
+              href="{{ url_for('condition_gallery', condition_slug='vascular-lesion') }}"
+            >
+              <span class="feature-icon">🩸</span>
+              <span class="feature-name">Vascular Lesion</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script>
+      // Apply theme immediately to prevent flash
+      (function () {
+        const savedTheme = localStorage.getItem("medai-theme") || "dark";
+        document.body.classList.add(
+          savedTheme === "light" ? "light-mode" : "dark-mode",
+        );
+        const icon = document.getElementById("theme-icon");
+        if (icon) {
+          icon.textContent = savedTheme === "light" ? "🌙" : "🌞";
+        }
+      })();
+
+      function toggleTheme() {
+        const body = document.body;
+        const icon = document.getElementById("theme-icon");
+
+        if (body.classList.contains("dark-mode")) {
+          body.classList.remove("dark-mode");
+          body.classList.add("light-mode");
+          localStorage.setItem("medai-theme", "light");
+          icon.textContent = "🌙";
+        } else {
+          body.classList.remove("light-mode");
+          body.classList.add("dark-mode");
+          localStorage.setItem("medai-theme", "dark");
+          icon.textContent = "🌞";
+        }
+      }
+
+      // Scroll animations
+      const observerOptions = {
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px",
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("visible");
+          }
+        });
+      }, observerOptions);
+
+      document
+        .querySelectorAll(".fade-in")
+        .forEach((el) => observer.observe(el));
+    </script>
+  </body>
+</html>
