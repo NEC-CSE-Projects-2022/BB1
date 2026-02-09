@@ -1,4 +1,4 @@
-# 🩺 Skin Cancer Classification Using Deep Learning (HAM10000)
+# 🩺 Skin Lesion Classification Using Deep Learning (HAM10000)
 
 A deep learning–based system for **automated multiclass classification of skin lesions** using dermoscopic images from the **HAM10000 (Skin Cancer MNIST)** dataset. The project evaluates **CNN and Transformer-based architectures** and focuses on building a **robust, reproducible, and research-ready** medical image classification pipeline.
 
