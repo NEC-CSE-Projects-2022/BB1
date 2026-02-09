@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ condition_title }} - MedAI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=51">
+</head>
+<body class="dark-mode dashboard-page">
+
+    <nav class="dashboard-nav">
+        <div class="nav-left">
+            <a href="{{ url_for('welcome') }}" class="btn btn-outline btn-small">← Back</a>
+        </div>
+        <div class="nav-right">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-small">Dashboard</a>
+        </div>
+    </nav>
+
+    <div class="dashboard-content">
+        <div class="dashboard-header">
+            <h1>{{ condition_title }}</h1>
+            <p>Download sample images for this condition</p>
+        </div>
+
+        {% if images|length == 0 %}
+            <div class="gallery-empty glass-effect">
+                <h2>No images found</h2>
+                <p>
+                    Add images to:
+                    <code>{{ folder }}</code>
+                </p>
+                <p>
+                    Expected path:
+                    <code>static/photos/{{ folder }}/</code>
+                </p>
+            </div>
+        {% else %}
+            <div class="condition-gallery-grid">
+                {% for img in images %}
+                    <div class="condition-image-card glass-effect">
+                        <div class="condition-image-wrap">
+                            <img
+                                class="condition-image"
+                                src="{{ url_for('static', filename='photos/' ~ folder ~ '/' ~ img) }}"
+                                alt="{{ condition_title }} image">
+                        </div>
+                        <div class="condition-image-meta">
+                            <a
+                                class="btn btn-primary btn-block btn-small"
+                                href="{{ url_for('download_condition_image', condition_slug=condition_slug, filename=img) }}">
+                                Download
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+</body>
+</html>

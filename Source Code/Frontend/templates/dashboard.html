@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=50">
+</head>
+<body class="dark-mode dashboard-page">
+    
+    <!-- Top Navigation Bar -->
+    <nav class="dashboard-nav">
+        <div class="nav-left">
+            <div class="logo">
+                <!-- <span class="logo-icon">🧬</span>
+                <span class="logo-text">MedAI</span> -->
+            </div>
+        </div>
+        
+        <div class="nav-right">
+            <div class="user-info">
+                <span class="user-greeting">👋 Hello, <strong>{{ session.get('user_name', session.get('name', 'Guest')) }}</strong></span>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline btn-small">
+                🚪 Logout
+            </a>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-container">
+                {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }} fade-in">
+                        {{ message }}
+                        <button class="flash-close" onclick="this.parentElement.remove()">×</button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Main Dashboard Content -->
+    <div class="dashboard-content">
+        <div class="dashboard-header fade-in">
+            <h1>🔬 Skin Cancer Analysis</h1>
+            <p>Upload a dermatological image for instant AI-powered diagnosis</p>
+        </div>
+
+        <!-- Analysis Grid -->
+        <div class="analysis-grid-dashboard" id="analysisGrid">
+            <!-- Upload Card -->
+            <div class="upload-card-dashboard glass-effect fade-in">
+                <div class="card-header">
+                    <h2>📸 Upload Image</h2>
+                </div>
+                
+                <form method="POST" enctype="multipart/form-data" id="upload-form" class="upload-form-dashboard">
+                    <input type="file" name="image" accept="image/*" required id="image" style="display: none;">
+                    
+                    <label for="image" class="upload-zone-dashboard">
+                        <div class="upload-icon">📷</div>
+                        <h3>Click or Drag to Upload</h3>
+                        <p>Supports: JPG, PNG, JPEG (Max 10MB)</p>
+                    </label>
+                    
+                    <div id="preview-container" class="preview-container" style="display: none;">
+                        <img id="preview-img" class="preview-img-dashboard" alt="Preview">
+                        <div id="file-name-display" class="file-name-display"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-block btn-enhanced glow-on-hover" id="analyze-btn" disabled>
+                        🔍 Analyze Image
+                    </button>
+                </form>
+            </div>
+
+            <!-- Result Card -->
+            <div id="result-card" class="result-card-dashboard glass-effect" style="display: none;">
+                <div class="card-header">
+                    <h2>📊 Analysis Result</h2>
+                </div>
+                
+                <div class="result-image-container-dashboard">
+                    <img id="result-image" class="result-img-dashboard" alt="Analyzed" style="display: none;">
+                </div>
+                
+                <div class="result-diagnosis-dashboard">
+                    <h3>Detected Condition</h3>
+                    <div id="result-text" class="result-value-dashboard">Analyzing...</div>
+                </div>
+                
+                <button onclick="resetAnalysis()" class="btn btn-outline btn-block btn-enhanced">
+                    🔄 Analyze Another Image
+                </button>
+            </div>
+        </div>
+
+        <!-- Condition Details Section (shown after analysis) -->
+        <div id="condition-details" class="condition-details-section" style="display: none;">
+            <div class="condition-card glass-effect fade-in">
+                <h3 id="condition-title">📋 Condition Information</h3>
+                
+                <div class="condition-explanation">
+                    <h4>What is this condition?</h4>
+                    <p id="condition-description"></p>
+                </div>
+                
+                <div class="condition-recommendations">
+                    <h4>🏥 Medical Recommendations</h4>
+                    <ul id="condition-remedies"></ul>
+                </div>
+                
+                <div class="condition-disclaimer">
+                    <h4>⚠️ Important Notice</h4>
+                    <p>This AI analysis is for informational purposes only. <strong>Always consult a qualified dermatologist</strong> for proper diagnosis and treatment. Do not self-diagnose or self-medicate based on these results.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Condition information database
+        const conditionInfo = {
+            'Actinic keratosis': {
+                description: 'A rough, scaly patch on the skin that develops from years of sun exposure. It is considered pre-cancerous and can potentially lead to squamous cell carcinoma if left untreated. These lesions typically appear on sun-exposed areas like the face, hands, and arms.',
+                remedies: [
+                    'Schedule an appointment with a dermatologist for proper evaluation',
+                    'Avoid further sun exposure and use broad-spectrum sunscreen (SPF 30+)',
+                    'Treatment options include cryotherapy (freezing), topical medications, or photodynamic therapy',
+                    'Regular skin checks are essential to monitor for changes',
+                    'Consider wearing protective clothing and wide-brimmed hats outdoors',
+                    'Early treatment is crucial to prevent progression to skin cancer'
+                ]
+            },
+            'Basal cell carcinoma': {
+                description: 'A type of skin cancer that originates in the basal cells of the skin. It is often caused by prolonged UV radiation exposure and is the most common form of skin cancer. While it rarely spreads to other parts of the body, it can cause significant local damage if left untreated.',
+                remedies: [
+                    '🚨 URGENT: Schedule immediate consultation with a dermatologist or oncologist',
+                    'Surgical removal (Mohs surgery) is typically the most effective treatment',
+                    'Other treatment options include curettage, cryotherapy, or radiation therapy',
+                    'Avoid sun exposure and use high SPF sunscreen daily',
+                    'Regular follow-up appointments are crucial after treatment',
+                    'Full-body skin examinations should be performed every 6-12 months',
+                    'Early detection and treatment have excellent cure rates (95%+)'
+                ]
+            },
+            'Benign keratosis': {
+                description: 'Non-cancerous skin growths that resemble moles or warts. These are very common in adults and do not pose any health risk. They may appear as raised, brown, or black spots with a waxy or scaly texture.',
+                remedies: [
+                    'No medical treatment is necessary unless irritated or for cosmetic reasons',
+                    'Consult a dermatologist if the lesion becomes painful, bleeds, or changes rapidly',
+                    'Removal options include cryotherapy or shave excision if desired',
+                    'Monitor for any changes in size, color, or texture',
+                    'Use sunscreen to prevent formation of new lesions',
+                    'Regular skin self-examinations are recommended'
+                ]
+            },
+            'Dermatofibroma': {
+                description: 'A common, benign fibrous skin lesion that feels like a firm nodule under the skin. Usually found on the legs, these harmless growths may develop after minor skin trauma like insect bites. They are completely non-cancerous.',
+                remedies: [
+                    'No treatment required unless causing discomfort or cosmetic concerns',
+                    'Surgical excision can be performed if desired, but may leave a scar',
+                    'Monitor for any unusual changes in size or appearance',
+                    'Apply moisturizer if the area becomes dry or itchy',
+                    'Avoid scratching or irritating the lesion',
+                    'Consult a dermatologist if you notice rapid growth or pain'
+                ]
+            },
+            'Melanocytic nevus': {
+                description: 'Also known as a mole, these are benign proliferations of melanocytes (pigment-producing cells). While most are harmless, they should be monitored as they can sometimes develop into melanoma, especially if they change in appearance.',
+                remedies: [
+                    'Regular monitoring using the ABCDE rule: Asymmetry, Border, Color, Diameter, Evolution',
+                    'Schedule annual skin checks with a dermatologist',
+                    'Photograph moles to track changes over time',
+                    'Use sunscreen (SPF 30+) and avoid tanning beds',
+                    'Seek immediate evaluation if a mole changes in size, shape, or color',
+                    'Consider removal if the mole is in an area prone to friction or irritation',
+                    'Avoid excessive sun exposure, especially during peak hours'
+                ]
+            },
+            'Vascular lesion': {
+                description: 'Benign growths formed by abnormal blood vessels in the skin. These include cherry angiomas, spider veins, and port-wine stains. They are generally harmless and purely cosmetic concerns.',
+                remedies: [
+                    'No medical treatment necessary unless bleeding or causing concern',
+                    'Laser therapy can effectively remove vascular lesions for cosmetic purposes',
+                    'Avoid trauma to the area to prevent bleeding',
+                    'Consult a dermatologist if the lesion grows rapidly or bleeds frequently',
+                    'Monitor for any changes in appearance',
+                    'Treatment options include sclerotherapy, electrocautery, or pulsed dye laser'
+                ]
+            },
+            'Melanoma': {
+                description: 'The most serious and dangerous type of skin cancer, arising from melanocytes. Melanoma can spread rapidly to other parts of the body (metastasize) if not detected and treated early. Early detection is absolutely critical for successful treatment and survival.',
+                remedies: [
+                    '🚨 EMERGENCY: Seek immediate medical attention from a dermatologist or oncologist',
+                    'Surgical excision with wide margins is the primary treatment',
+                    'Sentinel lymph node biopsy may be necessary to check for spread',
+                    'Additional treatments may include immunotherapy, targeted therapy, or chemotherapy',
+                    'Regular full-body skin examinations every 3-6 months after treatment',
+                    'Avoid all sun exposure and use SPF 50+ sunscreen religiously',
+                    'Genetic testing may be recommended for familial melanoma',
+                    'Psychological support and counseling are available',
+                    'Early-stage melanoma has a 5-year survival rate of over 99%'
+                ]
+            }
+        };
+
+        // Apply theme immediately
+        (function() {
+            const savedTheme = localStorage.getItem('medai-theme') || 'dark';
+            document.body.classList.add(savedTheme === 'light' ? 'light-mode' : 'dark-mode');
+            const icon = document.getElementById('theme-icon');
+            if (icon) icon.textContent = savedTheme === 'light' ? '🌙' : '🌞';
+        })();
+
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('theme-icon');
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                body.classList.add('light-mode');
+                localStorage.setItem('medai-theme', 'light');
+                icon.textContent = '🌙';
+            } else {
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+                localStorage.setItem('medai-theme', 'dark');
+                icon.textContent = '🌞';
+            }
+        }
+
+        // Auto-dismiss flash messages
+        setTimeout(() => {
+            document.querySelectorAll('.flash-message').forEach(msg => {
+                msg.style.opacity = '0';
+                setTimeout(() => msg.remove(), 300);
+            });
+        }, 5000);
+
+        // File upload handling
+        const imageInput = document.getElementById('image');
+        const previewImg = document.getElementById('preview-img');
+        const previewContainer = document.getElementById('preview-container');
+        const fileNameDisplay = document.getElementById('file-name-display');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const uploadForm = document.getElementById('upload-form');
+        const resultCard = document.getElementById('result-card');
+        const resultImage = document.getElementById('result-image');
+        const resultText = document.getElementById('result-text');
+        const analysisGrid = document.getElementById('analysisGrid');
+
+        if (imageInput) {
+            imageInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    
+                    // Validate file size (10MB)
+                    if (file.size > 10 * 1024 * 1024) {
+                        alert('File size must be less than 10MB');
+                        this.value = '';
+                        return;
+                    }
+                    
+                    fileNameDisplay.textContent = file.name;
+                    
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImg.src = e.target.result;
+                        previewContainer.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                    
+                    analyzeBtn.disabled = false;
+                }
+            });
+        }
+
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                analyzeBtn.textContent = '⏳ Analyzing...';
+                analyzeBtn.disabled = true;
+                
+                resultText.textContent = 'Analyzing your image...';
+                resultCard.style.display = 'block';
+                analysisGrid.classList.add('has-results');
+                
+                try {
+                    const response = await fetch('/predict-gallery', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        resultText.textContent = data.prediction;
+                        resultImage.src = previewImg.src;
+                        resultImage.style.display = 'block';
+                        
+                        // Show condition details
+                        displayConditionDetails(data.prediction);
+                        
+                        // Reset button
+                        analyzeBtn.textContent = '🔍 Analyze Image';
+                        analyzeBtn.disabled = false;
+                    } else {
+                        resultText.textContent = 'Error: ' + (data.error || 'Analysis failed');
+                        resultText.style.color = '#dc2626';
+                        document.getElementById('condition-details').style.display = 'none';
+                        
+                        // Reset button
+                        analyzeBtn.textContent = '🔍 Analyze Image';
+                        analyzeBtn.disabled = false;
+                    }
+                } catch (error) {
+                    resultText.textContent = 'Error: Could not analyze image';
+                    resultText.style.color = '#dc2626';
+                    console.error('Analysis error:', error);
+                    
+                    // Reset button
+                    analyzeBtn.textContent = '🔍 Analyze Image';
+                    analyzeBtn.disabled = false;
+                }
+            });
+        }
+
+        function displayConditionDetails(condition) {
+            const detailsSection = document.getElementById('condition-details');
+            const title = document.getElementById('condition-title');
+            const description = document.getElementById('condition-description');
+            const remediesList = document.getElementById('condition-remedies');
+            
+            // Find matching condition info
+            const info = conditionInfo[condition];
+            
+            if (info) {
+                title.textContent = `📋 ${condition} - Details & Recommendations`;
+                description.textContent = info.description;
+                
+                // Clear and populate remedies list
+                remediesList.innerHTML = '';
+                info.remedies.forEach(remedy => {
+                    const li = document.createElement('li');
+                    li.textContent = remedy;
+                    remediesList.appendChild(li);
+                });
+                
+                // Show the section with animation
+                detailsSection.style.display = 'block';
+                setTimeout(() => {
+                    detailsSection.querySelector('.condition-card').classList.add('visible');
+                }, 100);
+            } else {
+                detailsSection.style.display = 'none';
+            }
+        }
+
+        function resetAnalysis() {
+            imageInput.value = '';
+            previewImg.src = '';
+            previewContainer.style.display = 'none';
+            fileNameDisplay.textContent = '';
+            resultCard.style.display = 'none';
+            resultImage.style.display = 'none';
+            resultText.style.color = '';
+            analyzeBtn.disabled = true;
+            analyzeBtn.textContent = '🔍 Analyze Image';
+            analysisGrid.classList.remove('has-results');
+            
+            // Hide condition details
+            document.getElementById('condition-details').style.display = 'none';
+        }
+
+        // Scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>
